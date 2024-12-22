@@ -22,7 +22,7 @@ This is a simple chatbot application that uses the Gemini AI model (via the `goo
 1.  **Clone the repository (optional):**
 
     ```bash
-    git clone 
+    git clone https://github.com/lalji-solanki/gemini-chatbot.git
     cd gemini-chatbot
     ```
 
