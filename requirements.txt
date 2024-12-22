@@ -9,3 +9,5 @@ googleapis-common-protos==1.66.0
 pytest==7.0.0
 pytest-mock==3.10.0
 python-dotenv==1.0.1
+chromadb==0.5.23
+Flask-SocketIO==5.5.0
