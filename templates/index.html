@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gemini Chatbot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        #chat-container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        #chat-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .message {
+            margin-bottom: 5px;
+            padding: 8px;
+            border-radius: 5px;
+            clear: both;
+            word-wrap: break-word;
+        }
+        .user {
+            background-color: #e0f2f7;
+            text-align: right;
+            float: right;
+        }
+        .bot {
+            background-color: #f0f0f0;
+            text-align: left;
+            float: left;
+        }
+        #input-area {
+            display: flex;
+        }
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        button {
+            width: 60px;
+            padding: 8px;
+        }
+        @media (max-width: 600px) {
+            #chat-container {
+                width: 95%;
+            }
+            input[type="text"]{
+                width: calc(100% - 65px);
+            }
+            button{
+                width: 55px;
+            }
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <h1>Gemini Chatbot</h1>
+        <div id="chat-area"></div>
+        <div id="input-area">
+            <input type="text" id="user-message" autofocus>
+            <button id="send-button">Send</button>
+        </div>
+        <div id="loading">Generating response...</div>
+    </div>
+
+    <script>
+        const chatArea = document.getElementById("chat-area");
+        const userMessageInput = document.getElementById("user-message");
+        const sendButton = document.getElementById("send-button");
+        const loadingMessage = document.getElementById("loading");
+
+        function displayMessage(message, sender) {
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add("message", sender);
+            messageDiv.textContent = message;
+            chatArea.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        sendButton.addEventListener("click", () => {
+            const userMessage = userMessageInput.value;
+            if (userMessage.trim() !== "") {
+                displayMessage(userMessage, "user");
+                userMessageInput.value = "";
+
+                loadingMessage.style.display = "block";
+                sendButton.disabled = true;
+
+                fetch("/get_response", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: new URLSearchParams({ user_message: userMessage }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    displayMessage(data.bot_response, "bot");
+                    loadingMessage.style.display = "none";
+                    sendButton.disabled = false;
+                })
+                .catch((error)=>{
+                    console.error("Error fetching response:", error);
+                    displayMessage("An error occurred. Please try again.", "bot");
+                    loadingMessage.style.display = "none";
+                    sendButton.disabled = false;
+                });
+            }
+        });
+
+        userMessageInput.addEventListener("keyup", function(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                sendButton.click();
+            }
+        });
+    </script>
+</body>
+</html>
