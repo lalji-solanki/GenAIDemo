@@ -8,3 +8,4 @@ google-generativeai==0.8.3
 googleapis-common-protos==1.66.0
 pytest==7.0.0
 pytest-mock==3.10.0
+python-dotenv==1.0.1
