@@ -44,6 +44,38 @@
             background-color: #f0f0f0;
             text-align: left;
             float: left;
+            font-family: "Courier New", monospace;
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        code {
+            background-color: #f5f5f5;
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 1.1em;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 1em;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        a {
+            color: #1e90ff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
         }
         #input-area {
             display: flex;
@@ -62,10 +94,10 @@
             #chat-container {
                 width: 95%;
             }
-            input[type="text"]{
+            input[type="text"] {
                 width: calc(100% - 65px);
             }
-            button{
+            button {
                 width: 55px;
             }
         }
@@ -74,9 +106,23 @@
             text-align: center;
             margin-top: 10px;
         }
+        #dashboard-button {
+            margin: 10px auto;
+            padding: 10px;
+            width: 200px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #dashboard-button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
+
     <div id="chat-container">
         <h1>Gemini Chatbot</h1>
         <div id="chat-area"></div>
@@ -93,10 +139,28 @@
         const sendButton = document.getElementById("send-button");
         const loadingMessage = document.getElementById("loading");
 
+        function styleBotResponse(response) {
+            // Bold: *text* or **text**
+            response = response.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+            response = response.replace(/\*(.*?)\*/g, '<b>$1</b>');
+            // Italic: _text_
+            response = response.replace(/_(.*?)_/g, '<i>$1</i>');
+            // Bullet points: - or * at the beginning of a line
+            response = response.replace(/(?:^|\n)[\*\-]\s*(.*?)(?=\n|\s|$)/g, '<ul><li>$1</li></ul>');
+            // Links: [text](url)
+            response = response.replace(/\[([^\]]+)\]\((http[s]?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+            // Code blocks: ```code```
+            response = response.replace(/```(.*?)```/gs, '<pre>$1</pre>');
+            // Inline code: `code`
+            response = response.replace(/`(.*?)`/g, '<code>$1</code>');
+            return response;
+        }
+
         function displayMessage(message, sender) {
             const messageDiv = document.createElement("div");
             messageDiv.classList.add("message", sender);
-            messageDiv.textContent = message;
+            // Apply styling to the response
+            messageDiv.innerHTML = styleBotResponse(message);
             chatArea.appendChild(messageDiv);
             chatArea.scrollTop = chatArea.scrollHeight;
         }
@@ -119,6 +183,7 @@
                 })
                 .then(response => response.json())
                 .then(data => {
+                    // Here, the bot response is processed to apply styles like bold, italic, etc.
                     displayMessage(data.bot_response, "bot");
                     loadingMessage.style.display = "none";
                     sendButton.disabled = false;

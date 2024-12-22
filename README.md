@@ -1,4 +1,4 @@
-# Gemini Chatbot
+# Chatbot using Gemini
 
 This is a simple chatbot application that uses the Gemini AI model (via the `google-generativeai` library) to generate responses to user input. It provides a web-based user interface using Flask.
 
